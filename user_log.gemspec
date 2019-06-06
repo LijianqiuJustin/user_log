@@ -1,17 +1,18 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
 require "user_log/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "user_log"
-  spec.version       = UserLog::VERSION
+  spec.version       = UserLogs::VERSION
   spec.authors       = ["Ben Zhang"]
   spec.email         = ["bzbnhang@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because RubyGems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Track User Log Module}
+  spec.description   = %q{Track User Log Module}
+  spec.homepage      = ""
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
