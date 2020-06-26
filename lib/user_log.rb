@@ -1,7 +1,7 @@
 require "user_log/engine"
 
 module UserLogs
-  autoload :ParameterFilter,    '/user_log/parameter_filter'
+  # autoload :ParameterFilter,    '/user_log/parameter_filter'
 
   module Controllers
     autoload :Helpers,        'user_log/controllers/helpers'
@@ -17,11 +17,14 @@ module UserLogs
   @@has_action_params = true
   mattr_accessor :use_sidekiq
   @@use_sidekiq = false
-  mattr_accessor :same_path_with_devise
-  @@same_path_with_devise = false
+  mattr_accessor :log_model
+  @@log_model = 'UserLog'
   mattr_accessor :send_notification
-  @@send_notification = false
-
+  @@send_notification = true
+  mattr_accessor :has_browser_uuid
+  @@has_browser_uuid = false
+  mattr_accessor :log_nil_user
+  @@log_nil_user = false
 
   def self.setup
     yield self

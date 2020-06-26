@@ -16,13 +16,20 @@ module UserLogs
         elsif track_users = extras[:only_track]
           track_users.each do |track_user|
             user = get_trackable_user(track_user)
-            generate_user_log(user, req_params)
+            generate_user_log(user, req_params) if user.present?
           end
         else
           # track default users
+          has_user = false
           UserLogs.track_users.each do |track_user|
             user = get_trackable_user(track_user)
-            generate_user_log(user, req_params)
+            has_user = true if user.present?
+            generate_user_log(user, req_params) if user.present?
+          end
+
+          # track user is nil
+          unless has_user
+            generate_user_log(nil, req_params) if UserLogs.log_nil_user
           end
         end
       rescue StandardError => e
@@ -68,7 +75,7 @@ module UserLogs
       end
 
       def generate_user_log(user, req_params)
-        return if user.blank?
+        # return if user.blank?
         
         response_body = if @save_response
           JSON.parse(response.body).inspect rescue nil
@@ -79,6 +86,7 @@ module UserLogs
         attributes = {
           ip:             request.remote_ip,
           user_id:        user.try(:id),
+          user_id:        user.try(:class).try(:name),
           country:        user.try(:country),
           method:         request.method,
           url:            request.fullpath[0..254],
@@ -86,21 +94,22 @@ module UserLogs
           agent:          request.env['HTTP_USER_AGENT'].try(:[], (0..254)),
           params:         req_params,
           response_body:  response_body,
-          created_at:     Time.now
+          created_at:     Time.zone.now,
+          browser_uuid:   set_browser_uuid
         }      
         if Rails.env.production? && @delay_enter_log
-          # TODO
-          # UserLogWorker.perform_async(attributes)
+          "#{UserLogs.log_model}sWorker".constantize.perform_async(attributes)
         else
-          get_user_log_classname(user).constantize.create!(attributes)
+          UserLogs.log_model.constantize.create!(attributes)
         end
       end
 
-      def get_user_log_classname(user)
-        if UserLogs.same_path_with_devise
-          "#{user.class.name}Log"
-        else
-          "#{Devise.mappings.map{|m| m.first if m.last.class_name == user.class.name}.reject(&:blank?).first.to_s.camelize}Log"
+      def set_browser_uuid
+        if UserLogs.has_browser_uuid
+          if cookies[:browser_uuid].blank?
+            cookies[:browser_uuid] = SecureRandom.uuid
+          end
+          cookies[:browser_uuid]
         end
       end
 

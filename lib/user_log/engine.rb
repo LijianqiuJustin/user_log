@@ -1,3 +1,4 @@
+require 'rails/engine'
 require "user_log/version"
 
 module UserLogs
