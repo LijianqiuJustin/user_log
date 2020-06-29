@@ -83,10 +83,10 @@ module UserLogs
 
         response_body = if @save_response
                           begin
-            JSON.parse(response.body).inspect
+                            JSON.parse(response.body).inspect
                           rescue StandardError
                             nil
-          end
+                          end
                         end
 
         attributes = {

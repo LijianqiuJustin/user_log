@@ -29,12 +29,16 @@ Gem::Specification.new do |spec|
   spec.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
   spec.add_dependency 'rails', '~> 5.2.4', '>= 5.2.4.3'
+  spec.add_dependency 'devise'
+  spec.add_dependency 'exception_notification'
+  spec.add_dependency 'pg'
+  spec.add_dependency 'sidekiq'
+  spec.add_dependency 'redis-rails'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
-  spec.add_development_dependency 'devise'
-  spec.add_development_dependency 'exception_notification'
   spec.add_development_dependency 'pg'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'sidekiq', '~> 5.0.4'
+  spec.add_development_dependency 'generator_spec'
 end

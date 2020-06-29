@@ -3,7 +3,7 @@
 require 'test_helper'
 
 class UserLogs::Test < ActiveSupport::TestCase
-  test 'truth' do
+  test 'user_log' do
     assert_kind_of Module, UserLogs
   end
 end
