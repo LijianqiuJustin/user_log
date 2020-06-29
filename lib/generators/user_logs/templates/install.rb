@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 UserLogs.setup do |config|
   config.log_model = '<%= log_model %>'
   # set devise users to be tracked
   config.track_users = [:user]
   # set controllers to be tracked
-  config.track_controllers = %w{ActionController::API ApplicationController}
+  config.track_controllers = %w[ActionController::API ApplicationController]
   # record controller params
   config.has_controller_params = false
   # record action params

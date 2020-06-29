@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module UserLogs
   module Controllers
     # methods added to Controller.
@@ -40,7 +42,9 @@ module UserLogs
 
       def process_log_parameters
         request_parameters = params.dup
-        request_parameters.delete(:controller) unless UserLogs.has_controller_params
+        unless UserLogs.has_controller_params
+          request_parameters.delete(:controller)
+        end
         request_parameters.delete(:action) unless UserLogs.has_action_params
         req_params = 'none'
 
@@ -60,15 +64,15 @@ module UserLogs
           end
         end
 
-        return req_params
+        req_params
       end
 
       def get_trackable_user(track_user)
         trackable_user = Devise.mappings[track_user]
         return nil if trackable_user.blank?
 
-        if self.try("#{track_user.to_s}_signed_in?") || instance_variable_defined?("@#{track_user.to_s}")
-          return self.try("current_#{track_user.to_s}") || instance_variable_get("@#{track_user.to_s}")
+        if try("#{track_user}_signed_in?") || instance_variable_defined?("@#{track_user}")
+          return try("current_#{track_user}") || instance_variable_get("@#{track_user}")
         else
           return nil
         end
@@ -76,27 +80,29 @@ module UserLogs
 
       def generate_user_log(user, req_params)
         # return if user.blank?
-        
+
         response_body = if @save_response
-          JSON.parse(response.body).inspect rescue nil
-        else
-          nil
-        end
-        
+                          begin
+            JSON.parse(response.body).inspect
+                          rescue StandardError
+                            nil
+          end
+                        end
+
         attributes = {
-          ip:             request.remote_ip,
-          user_id:        user.try(:id),
-          user_id:        user.try(:class).try(:name),
-          country:        user.try(:country),
-          method:         request.method,
-          url:            request.fullpath[0..254],
-          response:       (@user_log_code || response.code),
-          agent:          request.env['HTTP_USER_AGENT'].try(:[], (0..254)),
-          params:         req_params,
-          response_body:  response_body,
-          created_at:     Time.zone.now,
-          browser_uuid:   set_browser_uuid
-        }      
+          ip: request.remote_ip,
+          user_id: user.try(:id),
+          user_type: user.try(:class).try(:name),
+          country: user.try(:country),
+          method: request.method,
+          url: request.fullpath[0..254],
+          response: (@user_log_code || response.code),
+          agent: request.env['HTTP_USER_AGENT'].try(:[], (0..254)),
+          params: req_params,
+          response_body: response_body,
+          created_at: Time.zone.now,
+          browser_uuid: set_browser_uuid
+        }
         if Rails.env.production? && @delay_enter_log
           "#{UserLogs.log_model}sWorker".constantize.perform_async(attributes)
         else

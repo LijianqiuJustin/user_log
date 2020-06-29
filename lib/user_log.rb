@@ -1,16 +1,18 @@
-require "user_log/engine"
+# frozen_string_literal: true
+
+require 'user_log/engine'
 
 module UserLogs
   # autoload :ParameterFilter,    '/user_log/parameter_filter'
 
   module Controllers
-    autoload :Helpers,        'user_log/controllers/helpers'
+    autoload :Helpers, 'user_log/controllers/helpers'
   end
 
   mattr_accessor :track_users
   @@track_users = [:user]
   mattr_accessor :track_controllers
-  @@track_controllers = ["ActionController", "ApplicationController"]
+  @@track_controllers = %w[ActionController ApplicationController]
   mattr_accessor :has_controller_params
   @@has_controller_params = true
   mattr_accessor :has_action_params
